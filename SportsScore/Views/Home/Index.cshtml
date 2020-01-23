@@ -1,0 +1,177 @@
+﻿@model SportsScore.Models.ProductsList
+
+@{
+    ViewData["Title"] = "Index";
+
+    string nameSort = ViewData["CurrentSortParam"].ToString();
+    string priceSort = ViewData["CurrentSortParam"].ToString();
+}
+
+<h2>Products</h2>
+<hr />
+<style>
+    .pagination {
+        display: flex;
+        justify-content: center;
+    }
+
+    .page {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background: #ccc;
+        width: 20px;
+        height: 20px;
+        min-width: 20px;
+        margin: 0 10px;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+
+    .page-item.disabled {
+        pointer-events: none;
+    }
+
+    /*.list{
+        padding:20px;
+        display:grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        grid-gap: 20px;
+        background-color:aliceblue;*/
+    }
+
+    .card-holder {
+        width: 100%;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        background-color: white;
+        border-radius: 10px;
+    }
+
+    .img-holder {
+        width: 100%;
+    }
+
+    .text-holder {
+        padding: 10px;
+    }
+
+    .price {
+        display: flex;
+        text-align: center;
+        justify-content: space-between;
+    }
+
+    .add-to-cart {
+        border-radius: 20px;
+        border: none;
+        padding: 10px;
+        min-width: 40%;
+        color: white;
+        background-color: dodgerblue
+    }
+</style>
+
+<form style="display:flex;justify-content:space-between;align-items:baseline; margin-bottom: 20px;" asp-action="Add" asp-controller="Home">
+    <div asp-validation-summary="All"></div>
+    <p>Name:</p>
+    <input name="Name" type="text" />
+    <p>Price:</p>
+    <input name="Price" type="number" />
+    <p>Description:</p>
+    <input name="desc" type="text" />
+    <p>Category:</p>
+    <input name="Category" type="text" />
+    <br />
+    <button type="submit">Submit</button>
+</form>
+
+<div class="list">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>
+                    <a asp-action="Index" asp-route-sortOrder="@ViewData["NameSortParm"]">
+                        @if (nameSort == "name")
+                        {
+                            <span>Name ↑</span>
+                        }
+                        else if (nameSort == "name_desc")
+                        {
+                            <span>Name ↓</span>
+                        }
+                        else
+                        {
+                            <span>Name</span>
+                        }
+                    </a>
+                </th>
+                <th>
+                    Description
+                </th>
+                <th>
+                    <a asp-action="Index" asp-route-sortOrder="@ViewData["PriceSortParm"]">
+                        @if (priceSort == "price")
+                        {
+                            <span>Price ↑</span>
+                        }
+                        else if (priceSort == "price_desc")
+                        {
+                            <span>Price ↓</span>
+                        }
+                        else
+                        {
+                            <span>Price</span>
+                        }
+                    </a>
+                </th>
+                <th>
+
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.Products)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Name)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Description)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Price)
+                    </td>
+                    <td class="row">
+                        @*<a asp-action="Edit" asp-route-id="@item.ProductID" style="color: dodgerblue; cursor: pointer;">Edit</a>*@
+                        <a asp-action="Delete" asp-route-id="@item.ProductID" style="color: red; cursor: pointer; margin-left: 5px;">Delete</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+@{
+    double pageCount = Math.Ceiling((double)Model.TotalCount / Model.PageSize);
+
+    <ul class="pagination">
+        <li class="page-item @(Model.CurrentPageIndex == 0 ? "disabled" : "")">
+            <a class="page-link" asp-controller="home" asp-action="index" asp-route-currentPageIndex="@Math.Max(Model.CurrentPageIndex - 1, 0)" asp-route-sortOrder="@ViewData["CurrentSortParam"]">Previous</a>
+        </li>
+
+        @for (int i = 0; i < pageCount; i++)
+        {
+
+            <li class="page-item @(Model.CurrentPageIndex == i ? "active" : "")">
+                <a class="page-link" asp-controller="home" asp-action="index" asp-route-currentPageIndex="@i" asp-route-sortOrder="@ViewData["CurrentSortParam"]">@(i + 1)</a>
+            </li>
+        }
+
+        <li class="page-item @(Model.CurrentPageIndex == pageCount - 1 ? "disabled" : "")">
+            <a class="page-link" asp-controller="home" asp-action="index" asp-route-currentPageIndex="@Math.Min(Model.CurrentPageIndex + 1, pageCount - 1)" asp-route-sortOrder="@ViewData["CurrentSortParam"]">Next</a>
+        </li>
+    </ul>
+}
